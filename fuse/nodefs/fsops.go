@@ -167,7 +167,7 @@ func (c *rawBridge) OpenDir(input *fuse.OpenIn, out *fuse.OpenOut) (code fuse.St
 		rawFS: c,
 	}
 	h, opened := node.mount.registerFileHandle(node, de, nil, input.Flags)
-	out.OpenFlags = opened.FuseFlags
+	out.OpenFlags = opened.FuseFlags | fuse.FOPEN_KEEP_CACHE | fuse.FOPEN_CACHE_DIR
 	out.Fh = h
 	return fuse.OK
 }
