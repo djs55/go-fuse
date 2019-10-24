@@ -87,7 +87,7 @@ func doInit(server *Server, req *request) {
 	server.reqMu.Lock()
 	server.kernelSettings = *input
 	server.kernelSettings.Flags = input.Flags & (CAP_ASYNC_READ | CAP_BIG_WRITES | CAP_FILE_OPS |
-		CAP_AUTO_INVAL_DATA | CAP_READDIRPLUS | CAP_NO_OPEN_SUPPORT)
+		CAP_AUTO_INVAL_DATA | CAP_READDIRPLUS | CAP_NO_OPEN_SUPPORT | CAP_MAX_PAGES)
 
 	if server.opts.EnableLocks {
 		server.kernelSettings.Flags |= CAP_FLOCK_LOCKS | CAP_POSIX_LOCKS
@@ -107,6 +107,7 @@ func doInit(server *Server, req *request) {
 		MaxWrite:            uint32(server.opts.MaxWrite),
 		CongestionThreshold: uint16(server.opts.MaxBackground * 3 / 4),
 		MaxBackground:       uint16(server.opts.MaxBackground),
+		MaxPages:            uint16(MAX_KERNEL_WRITE / pageSize),
 	}
 
 	if server.opts.MaxReadAhead != 0 && uint32(server.opts.MaxReadAhead) < out.MaxReadAhead {
