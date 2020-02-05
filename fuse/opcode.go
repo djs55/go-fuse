@@ -87,7 +87,7 @@ func doInit(server *Server, req *request) {
 	server.reqMu.Lock()
 	server.kernelSettings = *input
 	server.kernelSettings.Flags = input.Flags & (CAP_ASYNC_READ | CAP_BIG_WRITES | CAP_FILE_OPS |
-		CAP_AUTO_INVAL_DATA | /* CAP_READDIRPLUS | */ CAP_NO_OPEN_SUPPORT | CAP_MAX_PAGES)
+		CAP_AUTO_INVAL_DATA | /* CAP_READDIRPLUS | */ CAP_NO_OPEN_SUPPORT | CAP_MAX_PAGES | CAP_WRITEBACK_CACHE)
 
 	if server.opts.EnableLocks {
 		server.kernelSettings.Flags |= CAP_FLOCK_LOCKS | CAP_POSIX_LOCKS
