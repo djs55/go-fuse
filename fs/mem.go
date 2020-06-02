@@ -6,10 +6,10 @@ package fs
 
 import (
 	"context"
-	"sync"
 	"syscall"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // MemRegularFile is a filesystem node that holds a read-only data
@@ -17,7 +17,7 @@ import (
 type MemRegularFile struct {
 	Inode
 
-	mu   sync.Mutex
+	mu   deadlock.Mutex
 	Data []byte
 	Attr fuse.Attr
 }

@@ -11,11 +11,11 @@ import (
 	"math/rand"
 	"sort"
 	"strings"
-	"sync"
 	"syscall"
 	"unsafe"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type parentData struct {
@@ -72,7 +72,7 @@ type Inode struct {
 	// mu protects the following mutable fields. When locking
 	// multiple Inodes, locks must be acquired using
 	// lockNodes/unlockNodes
-	mu sync.Mutex
+	mu deadlock.Mutex
 
 	// persistent indicates that this node should not be removed
 	// from the tree, even if there are no live references. This

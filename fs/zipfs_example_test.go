@@ -14,11 +14,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"syscall"
 
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // zipFile is a file read from a zip archive.
@@ -26,7 +26,7 @@ type zipFile struct {
 	fs.Inode
 	file *zip.File
 
-	mu   sync.Mutex
+	mu   deadlock.Mutex
 	data []byte
 }
 

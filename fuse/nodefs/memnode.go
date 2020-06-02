@@ -7,11 +7,11 @@ package nodefs
 import (
 	"fmt"
 	"os"
-	"sync"
 	"syscall"
 	"time"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // NewMemNodeFSRoot creates an in-memory node-based filesystem. Files
@@ -28,7 +28,7 @@ type memNodeFs struct {
 	backingStorePrefix string
 	root               *memNode
 
-	mutex    sync.Mutex
+	mutex    deadlock.Mutex
 	nextFree int
 }
 
@@ -75,7 +75,7 @@ type memNode struct {
 	fs *memNodeFs
 	id int
 
-	mu   sync.Mutex
+	mu   deadlock.Mutex
 	link string
 	info fuse.Attr
 }

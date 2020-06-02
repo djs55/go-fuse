@@ -6,18 +6,18 @@ package test
 
 import (
 	"os"
-	"sync"
 	"testing"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
 	"github.com/hanwen/go-fuse/v2/internal/testutil"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type rootNode struct {
 	nodefs.Node
 	// represents backing store.
-	mu      sync.Mutex
+	mu      deadlock.Mutex
 	backing map[string]string
 }
 

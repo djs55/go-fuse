@@ -6,9 +6,9 @@ package nodefs
 
 import (
 	"log"
-	"sync"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type connectorDir struct {
@@ -18,7 +18,7 @@ type connectorDir struct {
 
 	// Protect stream and lastOffset.  These are written in case
 	// there is a seek on the directory.
-	mu     sync.Mutex
+	mu     deadlock.Mutex
 	stream []fuse.DirEntry
 }
 

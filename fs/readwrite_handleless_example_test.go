@@ -8,12 +8,12 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"sync"
 	"syscall"
 	"time"
 
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // bytesNode is a file that can be read and written
@@ -22,7 +22,7 @@ type bytesNode struct {
 
 	// When file systems are mutable, all access must use
 	// synchronization.
-	mu      sync.Mutex
+	mu      deadlock.Mutex
 	content []byte
 	mtime   time.Time
 }

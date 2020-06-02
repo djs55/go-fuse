@@ -7,12 +7,14 @@ package fuse
 import (
 	"os"
 	"sync"
+
+	"github.com/sasha-s/go-deadlock"
 )
 
 // bufferPool implements explicit memory management. It is used for
 // minimizing the GC overhead of communicating with the kernel.
 type bufferPool struct {
-	lock sync.Mutex
+	lock deadlock.Mutex
 
 	// For each page size multiple a list of slice pointers.
 	buffersBySize []*sync.Pool

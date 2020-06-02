@@ -6,13 +6,13 @@ package fs
 
 import (
 	"context"
-	"sync"
 
 	//	"time"
 
 	"syscall"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 	"golang.org/x/sys/unix"
 )
 
@@ -23,7 +23,7 @@ func NewLoopbackFile(fd int) FileHandle {
 }
 
 type loopbackFile struct {
-	mu sync.Mutex
+	mu deadlock.Mutex
 	fd int
 }
 

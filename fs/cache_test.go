@@ -9,18 +9,18 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"sync"
 	"syscall"
 	"testing"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type keepCacheFile struct {
 	Inode
 	keepCache bool
 
-	mu      sync.Mutex
+	mu      deadlock.Mutex
 	content []byte
 	count   int
 }

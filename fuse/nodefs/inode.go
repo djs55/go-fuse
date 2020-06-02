@@ -7,9 +7,9 @@ package nodefs
 import (
 	"fmt"
 	"log"
-	"sync"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type parentData struct {
@@ -26,7 +26,7 @@ type Inode struct {
 	handled handled
 
 	// Number of open files and its protection.
-	openFilesMutex sync.Mutex
+	openFilesMutex deadlock.Mutex
 	openFiles      []*openedFile
 
 	fsInode Node

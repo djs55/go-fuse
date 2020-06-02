@@ -5,11 +5,11 @@
 package fs
 
 import (
-	"sync"
 	"syscall"
 	"unsafe"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type loopbackDirStream struct {
@@ -17,7 +17,7 @@ type loopbackDirStream struct {
 	todo []byte
 
 	// Protects fd so we can guard against double close
-	mu sync.Mutex
+	mu deadlock.Mutex
 	fd int
 }
 

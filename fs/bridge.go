@@ -14,6 +14,7 @@ import (
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/internal"
+	"github.com/sasha-s/go-deadlock"
 )
 
 func errnoToStatus(errno syscall.Errno) fuse.Status {
@@ -27,7 +28,7 @@ type fileEntry struct {
 	nodeIndex int
 
 	// Protects directory fields. Must be acquired before bridge.mu
-	mu sync.Mutex
+	mu deadlock.Mutex
 
 	// Directory
 	dirStream   DirStream
@@ -55,7 +56,7 @@ type rawBridge struct {
 
 	// mu protects the following data.  Locks for inodes must be
 	// taken before rawBridge.mu
-	mu           sync.Mutex
+	mu           deadlock.Mutex
 	nodes        map[uint64]*Inode
 	automaticIno uint64
 

@@ -5,18 +5,18 @@
 package pathfs
 
 import (
-	"sync"
 	"time"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type lockingFileSystem struct {
 	// Should be public so people reusing can access the wrapped
 	// FS.
 	FS   FileSystem
-	lock sync.Mutex
+	lock deadlock.Mutex
 }
 
 // NewLockingFileSystem is a wrapper that makes a FileSystem

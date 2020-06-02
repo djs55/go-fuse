@@ -6,19 +6,19 @@ package nodefs
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type lockingFile struct {
-	mu   *sync.Mutex
+	mu   *deadlock.Mutex
 	file File
 }
 
 // NewLockingFile serializes operations an existing File.
-func NewLockingFile(mu *sync.Mutex, f File) File {
+func NewLockingFile(mu *deadlock.Mutex, f File) File {
 	return &lockingFile{
 		mu:   mu,
 		file: f,
