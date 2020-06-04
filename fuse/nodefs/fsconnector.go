@@ -12,11 +12,11 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 	"unsafe"
 
 	"github.com/hanwen/go-fuse/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // Tests should set to true.
@@ -42,7 +42,7 @@ type FileSystemConnector struct {
 	// forgotten nodes to the kernel. Problems solved by this lock:
 	// https://github.com/hanwen/go-fuse/issues/168
 	// https://github.com/rfjakob/gocryptfs/issues/322
-	lookupLock sync.Mutex
+	lookupLock deadlock.Mutex
 }
 
 // NewOptions generates FUSE options that correspond to libfuse's

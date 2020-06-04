@@ -11,13 +11,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 	"github.com/hanwen/go-fuse/fuse/pathfs"
+	"github.com/sasha-s/go-deadlock"
 )
 
 type knownFs struct {
@@ -34,7 +34,7 @@ type autoUnionFs struct {
 	pathfs.FileSystem
 	debug bool
 
-	lock             sync.RWMutex
+	lock             deadlock.RWMutex
 	zombies          map[string]bool
 	knownFileSystems map[string]knownFs
 	nameRootMap      map[string]string

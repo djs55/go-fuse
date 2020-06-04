@@ -5,8 +5,9 @@
 package unionfs
 
 import (
-	"sync"
 	"time"
+
+	"github.com/sasha-s/go-deadlock"
 )
 
 type cacheEntry struct {
@@ -27,7 +28,7 @@ type TimedCache struct {
 	// ttl is the duration of the cache.
 	ttl time.Duration
 
-	cacheMapMutex sync.RWMutex
+	cacheMapMutex deadlock.RWMutex
 	cacheMap      map[string]*cacheEntry
 
 	PurgeTimer *time.Timer

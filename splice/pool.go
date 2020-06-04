@@ -4,14 +4,12 @@
 
 package splice
 
-import (
-	"sync"
-)
+import "github.com/sasha-s/go-deadlock"
 
 var splicePool *pairPool
 
 type pairPool struct {
-	sync.Mutex
+	deadlock.Mutex
 	unused    []*Pair
 	usedCount int
 }

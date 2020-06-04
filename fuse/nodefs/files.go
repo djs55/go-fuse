@@ -7,10 +7,10 @@ package nodefs
 import (
 	"fmt"
 	"os"
-	"sync"
 	"syscall"
 
 	"github.com/hanwen/go-fuse/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // DataFile is for implementing read-only filesystems.  This
@@ -107,7 +107,7 @@ type loopbackFile struct {
 	// reuse the fd number after it is closed. When open races
 	// with another close, they may lead to confusion as which
 	// file gets written in the end.
-	lock sync.Mutex
+	lock deadlock.Mutex
 }
 
 func (f *loopbackFile) InnerFile() File {

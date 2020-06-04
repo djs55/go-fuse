@@ -5,8 +5,9 @@
 package benchmark
 
 import (
-	"sync"
 	"time"
+
+	"github.com/sasha-s/go-deadlock"
 )
 
 type latencyMapEntry struct {
@@ -15,7 +16,7 @@ type latencyMapEntry struct {
 }
 
 type LatencyMap struct {
-	sync.Mutex
+	deadlock.Mutex
 	stats map[string]*latencyMapEntry
 }
 

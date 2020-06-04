@@ -5,11 +5,11 @@
 package unionfs
 
 import (
-	"sync"
 	"time"
 
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/pathfs"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // newDirnameMap reads the contents of the given directory. On error,
@@ -44,7 +44,7 @@ type dirCache struct {
 	ttl time.Duration
 	fs  pathfs.FileSystem
 	// Protects data below.
-	lock sync.RWMutex
+	lock deadlock.RWMutex
 
 	// If nil, you may call refresh() to schedule a new one.
 	names         map[string]struct{}

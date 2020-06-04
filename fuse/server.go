@@ -15,6 +15,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/sasha-s/go-deadlock"
 )
 
 const (
@@ -30,7 +32,7 @@ type Server struct {
 	fileSystem RawFileSystem
 
 	// writeMu serializes close and notify writes
-	writeMu sync.Mutex
+	writeMu deadlock.Mutex
 
 	// I/O with kernel and daemon.
 	mountFd int
@@ -44,12 +46,12 @@ type Server struct {
 
 	// Pool for raw requests data
 	readPool       sync.Pool
-	reqMu          sync.Mutex
+	reqMu          deadlock.Mutex
 	reqReaders     int
 	kernelSettings InitIn
 
 	// in-flight notify-retrieve queries
-	retrieveMu   sync.Mutex
+	retrieveMu   deadlock.Mutex
 	retrieveNext uint64
 	retrieveTab  map[uint64]*retrieveCacheRequest // notifyUnique -> retrieve request
 

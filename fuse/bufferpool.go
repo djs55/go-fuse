@@ -7,6 +7,8 @@ package fuse
 import (
 	"os"
 	"sync"
+
+	"github.com/sasha-s/go-deadlock"
 )
 
 var paranoia bool
@@ -40,7 +42,7 @@ func (p *gcBufferPool) FreeBuffer(slice []byte) {
 }
 
 type bufferPoolImpl struct {
-	lock sync.Mutex
+	lock deadlock.Mutex
 
 	// For each page size multiple a list of slice pointers.
 	buffersBySize []*sync.Pool

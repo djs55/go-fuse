@@ -6,7 +6,8 @@ package fuse
 
 import (
 	"fmt"
-	"sync"
+
+	"github.com/sasha-s/go-deadlock"
 )
 
 ////////////////////////////////////////////////////////////////
@@ -14,7 +15,7 @@ import (
 
 type lockingRawFileSystem struct {
 	RawFS RawFileSystem
-	lock  sync.Mutex
+	lock  deadlock.Mutex
 }
 
 // Returns a Wrap

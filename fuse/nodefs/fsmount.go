@@ -6,10 +6,10 @@ package nodefs
 
 import (
 	"log"
-	"sync"
 	"unsafe"
 
 	"github.com/hanwen/go-fuse/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // openedFile stores either an open dir or an open file.
@@ -37,7 +37,7 @@ type fileSystemMount struct {
 	//
 	// If multiple treeLocks must be acquired, the treeLocks
 	// closer to the root must be acquired first.
-	treeLock sync.RWMutex
+	treeLock deadlock.RWMutex
 
 	// Manage filehandles of open files.
 	openFiles handleMap

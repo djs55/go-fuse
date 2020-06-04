@@ -17,11 +17,11 @@ symlinking path/to/zipfile to /config/zipmount
 import (
 	"log"
 	"path/filepath"
-	"sync"
 
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 	"github.com/hanwen/go-fuse/fuse/pathfs"
+	"github.com/sasha-s/go-deadlock"
 )
 
 const (
@@ -32,7 +32,7 @@ const (
 
 // MultiZipFs is a path filesystem that mounts zipfiles.
 type MultiZipFs struct {
-	lock          sync.RWMutex
+	lock          deadlock.RWMutex
 	zips          map[string]nodefs.Node
 	dirZipFileMap map[string]string
 

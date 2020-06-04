@@ -11,13 +11,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sync"
 	"syscall"
 	"testing"
 
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 	"github.com/hanwen/go-fuse/internal/testutil"
+	"github.com/sasha-s/go-deadlock"
 )
 
 func TestFlockExclusive(t *testing.T) {
@@ -67,7 +67,7 @@ func runExternalFlock(flockPath, fname string) ([]byte, error) {
 type lockingNode struct {
 	nodefs.Node
 
-	mu            sync.Mutex
+	mu            deadlock.Mutex
 	getLkInvoked  bool
 	setLkInvoked  bool
 	setLkwInvoked bool
