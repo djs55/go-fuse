@@ -9,11 +9,11 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // refCountedInode is used in clientInodeMap. The reference count is used to decide
@@ -37,7 +37,7 @@ type PathNodeFs struct {
 	connector *nodefs.FileSystemConnector
 
 	// protects clientInodeMap
-	pathLock sync.RWMutex
+	pathLock deadlock.RWMutex
 
 	// This map lists all the parent links known for a given inode number.
 	clientInodeMap map[uint64]*refCountedInode

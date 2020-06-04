@@ -12,11 +12,11 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 	"unsafe"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/sasha-s/go-deadlock"
 )
 
 // Tests should set to true.
@@ -45,7 +45,7 @@ type FileSystemConnector struct {
 	//
 	// The lock is shared: several concurrent Lookups are allowed to be
 	// run simultaneously, while Forget is exclusive.
-	lookupLock sync.RWMutex
+	lookupLock deadlock.RWMutex
 }
 
 // NewOptions generates FUSE options that correspond to libfuse's

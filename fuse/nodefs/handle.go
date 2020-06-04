@@ -6,7 +6,8 @@ package nodefs
 
 import (
 	"log"
-	"sync"
+
+	"github.com/sasha-s/go-deadlock"
 )
 
 // HandleMap translates objects in Go space to 64-bit handles that can
@@ -55,7 +56,7 @@ const _ALREADY_MSG = "Object already has a handle"
 // portable version using 32 bit integers.
 
 type portableHandleMap struct {
-	sync.RWMutex
+	deadlock.RWMutex
 	// The generation counter is incremented each time a NodeId is reused,
 	// hence the (NodeId, Generation) tuple is always unique.
 	generation uint64
