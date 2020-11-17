@@ -46,6 +46,9 @@ type Server struct {
 	// Pool for request structs.
 	reqPool sync.Pool
 
+	// Outstanding requests per-filehandle for RELEASE/RELEASEDIR to wait for.
+	fhWaitGroup map[uint64]*sync.WaitGroup
+
 	// Pool for raw requests data
 	readPool       sync.Pool
 	reqMu          sync.Mutex
@@ -165,6 +168,7 @@ func NewServer(fs RawFileSystem, mountPoint string, opts *MountOptions) (*Server
 		fileSystem:  fs,
 		opts:        &o,
 		retrieveTab: make(map[uint64]*retrieveCacheRequest),
+		fhWaitGroup: map[uint64]*sync.WaitGroup{},
 		// OSX has races when multiple routines read from the
 		// FUSE device: on unmount, sometime some reads do not
 		// error-out, meaning that unmount will hang.
@@ -307,12 +311,17 @@ func (ms *Server) readRequest(exitIdle bool) (req *request, code Status) {
 		dest = nil
 	}
 	ms.reqReaders--
+
+	return req, OK
+}
+
+func (ms *Server) considerReadingAnother() {
+	ms.reqMu.Lock()
+	defer ms.reqMu.Unlock()
 	if !ms.singleReader && ms.reqReaders <= 0 {
 		ms.loops.Add(1)
 		go ms.loop(true)
 	}
-
-	return req, OK
 }
 
 // returnRequest returns a request to the pool of unused requests.
@@ -440,6 +449,7 @@ exit:
 		}
 
 		if ms.singleReader {
+			// FIXME: this bypasses the filehandle release serialisation
 			go ms.handleRequest(req)
 		} else {
 			ms.handleRequest(req)
@@ -462,6 +472,40 @@ func (ms *Server) handleRequest(req *request) Status {
 		log.Println(req.InputDebug())
 	}
 
+	fh, valid := req.GetFh()
+	if !valid {
+		// Requests without filehandles are independent.
+		ms.considerReadingAnother()
+		return ms.handleRequest2(req)
+	}
+
+	wg, ok := ms.fhWaitGroup[fh]
+	if !ok {
+		wg = &sync.WaitGroup{}
+		ms.fhWaitGroup[fh] = wg
+	}
+
+	if req.inHeader.Opcode != _OP_RELEASE && req.inHeader.Opcode != _OP_RELEASEDIR {
+		// A future call to RELEASE will have to wait for us first.
+		wg.Add(1)
+		ms.considerReadingAnother()
+		return ms.handleRequest2(req)
+	}
+
+	// This RELEASE invalidates the filehandle: there won't be any future
+	// requests without a reopen.
+	delete(ms.fhWaitGroup, fh)
+
+	ms.considerReadingAnother()
+	go func() {
+		// Release waits for all the other users to complete first.
+		wg.Wait()
+		ms.handleRequest2(req)
+	}()
+	return OK
+}
+
+func (ms *Server) handleRequest2(req *request) Status {
 	if req.inHeader.NodeId == pollHackInode ||
 		req.inHeader.NodeId == FUSE_ROOT_ID && len(req.filenames) > 0 && req.filenames[0] == pollHackName {
 		doPollHackLookup(ms, req)
