@@ -77,6 +77,65 @@ func (r *request) clear() {
 	r.readResult = nil
 }
 
+func (r *request) GetFh() (uint64, bool) {
+	if r.handler.DecodeIn != nil {
+		d := r.handler.DecodeIn(r.inData)
+		switch d.(type) {
+		case *FlushIn:
+			return d.(*FlushIn).Fh, true
+		case *GetAttrIn:
+			return d.(*GetAttrIn).Fh(), true
+		case *SetXAttrIn:
+			return 0, false
+		case *GetXAttrIn:
+			return 0, false
+		case *SetAttrInCommon:
+			return d.(*SetAttrInCommon).GetFh()
+		case *InitIn:
+			return 0, false
+		case *_IoctlIn:
+			return 0, false
+		case *OpenIn:
+			return 0, false
+		case *MknodIn:
+			return 0, false
+		case *CreateIn:
+			return 0, false
+		case *ReadIn:
+			return d.(*ReadIn).Fh, true
+		case *WriteIn:
+			return d.(*WriteIn).Fh, true
+		case *AccessIn:
+			return 0, false
+		case *ForgetIn:
+			return 0, false
+		case *_BatchForgetIn:
+			return 0, false
+		case *LinkIn:
+			return 0, false
+		case *MkdirIn:
+			return 0, false
+		case *ReleaseIn:
+			return d.(*ReleaseIn).Fh, true
+		case *FallocateIn:
+			return d.(*FallocateIn).Fh, true
+		case *NotifyRetrieveIn:
+			return 0, false
+		case *Rename1In:
+			return 0, false
+		case *LkIn:
+			return d.(*LkIn).Fh, true
+		case *InterruptIn:
+			return 0, false
+		case *LseekIn:
+			return d.(*LseekIn).Fh, true
+		case *CopyFileRangeIn:
+			return d.(*CopyFileRangeIn).FhIn, true
+		}
+	}
+	return 0, false
+}
+
 func (r *request) InputDebug() string {
 	val := ""
 	if r.handler != nil && r.handler.DecodeIn != nil {
