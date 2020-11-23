@@ -47,7 +47,8 @@ type Server struct {
 	reqPool sync.Pool
 
 	// Outstanding requests per-filehandle for RELEASE/RELEASEDIR to wait for.
-	fhWaitGroup map[uint64]*sync.WaitGroup
+	fhWaitGroup  map[uint64]*sync.WaitGroup
+	fhWaitGroupM sync.Mutex
 
 	// Pool for raw requests data
 	readPool       sync.Pool
@@ -478,7 +479,9 @@ func (ms *Server) handleRequest(req *request) Status {
 		ms.handleRequest2(req)
 		decoded := req.handler.DecodeOut(req.outData())
 		if out, ok := decoded.(*OpenOut); ok {
-			ms.fhWaitGroup[out.Fh] = &sync.WaitGroup{}
+			ms.fhWaitGroupM.Lock()
+			ms.fhWaitGroup[out.Fh] = &sync.WaitGroup{} // concurrent write
+			ms.fhWaitGroupM.Unlock()
 			return ms.handleRequest3(req)
 		}
 		log.Printf("ERROR unable to decode %v %T", decoded, decoded)
@@ -493,7 +496,9 @@ func (ms *Server) handleRequest(req *request) Status {
 		return ms.handleRequest3(req)
 	}
 
+	ms.fhWaitGroupM.Lock()
 	wg, ok := ms.fhWaitGroup[fh]
+	ms.fhWaitGroupM.Unlock()
 	if !ok {
 		// Was never opened => will never be RELEASED
 		ms.considerReadingAnother()
@@ -512,7 +517,9 @@ func (ms *Server) handleRequest(req *request) Status {
 
 	// This RELEASE invalidates the filehandle: there won't be any future
 	// requests without a reopen.
+	ms.fhWaitGroupM.Lock()
 	delete(ms.fhWaitGroup, fh)
+	ms.fhWaitGroupM.Unlock()
 
 	ms.considerReadingAnother()
 	go func() {
